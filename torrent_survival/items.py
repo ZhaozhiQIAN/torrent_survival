@@ -19,5 +19,13 @@ class TorrentSurvivalItem(scrapy.Item):
     seed_num = scrapy.Field()
     download_num = scrapy.Field()
     complete_num = scrapy.Field()
-    releaser = scrapy.Field()
+    keyword = scrapy.Field()
     pass
+
+class AnimeItem(scrapy.Item):
+    name = scrapy.Field()
+    keyword = scrapy.Field()
+    weekday = scrapy.Field()
+
+class ReleaserItem(scrapy.Item):
+    name = scrapy.Field()
