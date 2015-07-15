@@ -3,24 +3,25 @@ from torrent_survival.items import TorrentSurvivalItem
 from datetime import datetime
 from urlparse import urlparse
 import MySQLdb
+import re
 
 class popgo_spider(scrapy.Spider):
     name = "popgo"
-    # start_urls = ["http://share.popgo.org/search.php?title=darkness"]
-    def start_requests(self):
-        db = MySQLdb.connect(host='localhost', user='root',
-                                    passwd='Windows9', db='ani_torr', charset='utf8')
-        try:
-            db.query("SELECT keyword FROM Anime;")
-        except MySQLdb.Error, e:
-            print "<selecting keyword> Error %d: %s" % (e.args[0], e.args[1])
-        r=db.store_result()
-        rows = r.fetch_row(maxrows=0)
-        for one_kw in rows:
-            one_kw = one_kw[0]
-            base_query = u'http://share.popgo.org/search.php?title={kw}'
-            url = base_query.format(kw = one_kw)
-            yield self.make_requests_from_url(url)
+    start_urls = ["http://share.popgo.org/search.php?title=darkness"]
+    # def start_requests(self):
+    #     db = MySQLdb.connect(host='localhost', user='root',
+    #                                 passwd='Windows9', db='ani_torr', charset='utf8')
+    #     try:
+    #         db.query("SELECT keyword FROM Anime;")
+    #     except MySQLdb.Error, e:
+    #         print "<selecting keyword> Error %d: %s" % (e.args[0], e.args[1])
+    #     r=db.store_result()
+    #     rows = r.fetch_row(maxrows=0)
+    #     for one_kw in rows:
+    #         one_kw = one_kw[0]
+    #         base_query = u'http://share.popgo.org/search.php?title={kw}'
+    #         url = base_query.format(kw = one_kw)
+    #         yield self.make_requests_from_url(url)
 
     def extract_keyword(self, curr_url):
         curr_url = curr_url
@@ -28,13 +29,26 @@ class popgo_spider(scrapy.Spider):
         for arg in url_args:
             if arg.startswith('title='):
                 page_keyword = arg[6:]
-                return page_keyword.replace('%','').decode('hex').decode('utf-8')
+                # hex0 = r'(?P<hex>%[A-Fa-f0-9]{2})'
+                # wd = r'(?P<wd>[A-Z]+)'
+                # hex_pat = re.compile('|'.join([hex0, wd]))
+                #
+                # scanner = hex_pat.scanner(page_keyword)
+                # tokens = []
+                # for m in iter(scanner.match, None):
+                #     if m.lastgroup == 'hex':
+                #         hexdigi = m.group()[1:].decode('hex').decode('utf-8')
+                #         tokens.append(hexdigi)
+                #     else:
+                #         tokens.append(m.group())
+                # return u''.join(tokens)
+                return page_keyword
 
     def parse(self,response):
         # TODO: handle "sorry no torrent found"
         main_table = response.css('#index_maintable > tbody:nth-child(1)')
         children = main_table.css('tr')
-        curr_url = response.url
+        curr_url = response.request.url
         page_keyword = self.extract_keyword(curr_url)
         crawl_next_page_flag = True
         for child in children[1:-1]:

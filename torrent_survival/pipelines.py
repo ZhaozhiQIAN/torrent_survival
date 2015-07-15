@@ -4,6 +4,7 @@ from scrapy.http import Request
 from datetime import datetime
 from torrent_survival import *
 import MySQLdb
+import re
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
@@ -121,6 +122,49 @@ class NewRecordPipeline(object):
             except MySQLdb.Error, e:
                 print "*INSERT INTO Record* Error %d: %s" % (e.args[0], e.args[1])
         # TODO: handle subid
+        # http://share.popgo.org/search.php?title=%E6%97%A5%E5%B8%B8%E5%A4%A7%E7%8E%8B%E3%80%91
+        uni_brac = u'(?P<uni_brac>【.+?】)'
+        sqr_brac = r'(?P<sqr_brac>\[\X+?\])'
+        round_brac = r'(?P<round_brac>\(\X+?\))'
+        ws = r'(?P<ws>\s+)'
+        master_pat = re.compile('|'.join([uni_brac, sqr_brac, round_brac, ws]))
+        # scanner = master_pat.scanner(u'【Dymy字幕組】【悠哉日常大王Repeat_Non Non Biyori Repeat】【01】【BIG5】【1280X720】【MP4】')
+        scanner = master_pat.scanner(item['torr_name'])
+        tokens = []
+        for m in iter(scanner.match, None):
+            if m.lastgroup != 'ws':
+                tokens.append(m.group()[1:-1])
+        sub_pat = re.compile('|'.join([u'.*字幕组',u'.*Raws.*',u'.*字幕社',u'.*汉化组',u'.*字幕組']))
+        sub_group = 'unk'
+        for tok in tokens[::-1]:
+            if sub_pat.match(tok):
+                sub_group = tok
+
+        if sub_group == 'unk':
+            print 'return item if no Subgroup is identified'
+            return item
+        # query the existence of Subgroup
+        try:
+            base_query = u'SELECT Subid FROM Releaser WHERE Releaser.name = "{name}";'.encode('utf-8')
+            query = base_query.format(name=sub_group.encode('utf-8'))
+            self.conn.query(query)
+        except MySQLdb.Error, e:
+            print "*SELECT Subid* Error %d: %s" % (e.args[0], e.args[1])
+        r=self.conn.store_result()
+        rows = r.fetch_row(maxrows=0)
+        # subgroup exist
+        if len(rows) != 0:
+            subid = rows[0][0]
+            insert_upload = u"""INSERT INTO upload
+            (tid, subid)
+            VALUES ("{tid}","{subid}");"""
+            insert_upload = insert_upload.format(tid=tid,subid=subid)
+            try:
+                self.cursor.execute(insert_upload)
+                self.conn.commit()
+            except MySQLdb.Error, e:
+                print "*INSERT INTO Upload* Error %d: %s" % (e.args[0], e.args[1])
+
         return item
 
 
