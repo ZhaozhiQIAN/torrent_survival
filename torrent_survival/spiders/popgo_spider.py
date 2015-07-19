@@ -7,21 +7,21 @@ import re
 
 class popgo_spider(scrapy.Spider):
     name = "popgo"
-    start_urls = ["http://share.popgo.org/search.php?title=darkness"]
-    # def start_requests(self):
-    #     db = MySQLdb.connect(host='localhost', user='root',
-    #                                 passwd='Windows9', db='ani_torr', charset='utf8')
-    #     try:
-    #         db.query("SELECT keyword FROM Anime;")
-    #     except MySQLdb.Error, e:
-    #         print "<selecting keyword> Error %d: %s" % (e.args[0], e.args[1])
-    #     r=db.store_result()
-    #     rows = r.fetch_row(maxrows=0)
-    #     for one_kw in rows:
-    #         one_kw = one_kw[0]
-    #         base_query = u'http://share.popgo.org/search.php?title={kw}'
-    #         url = base_query.format(kw = one_kw)
-    #         yield self.make_requests_from_url(url)
+    # start_urls = ["http://share.popgo.org/search.php?title=darkness"]
+    def start_requests(self):
+        db = MySQLdb.connect(host='localhost', user='root',
+                                    passwd='Windows9', db='ani_torr', charset='utf8')
+        try:
+            db.query("SELECT keyword FROM Anime;")
+        except MySQLdb.Error, e:
+            print "<selecting keyword> Error %d: %s" % (e.args[0], e.args[1])
+        r=db.store_result()
+        rows = r.fetch_row(maxrows=0)
+        for one_kw in rows:
+            one_kw = one_kw[0]
+            base_query = u'http://share.popgo.org/search.php?title={kw}'
+            url = base_query.format(kw = one_kw)
+            yield self.make_requests_from_url(url)
 
     def extract_keyword(self, curr_url):
         curr_url = curr_url
