@@ -14,12 +14,11 @@ SPIDER_MODULES = ['torrent_survival.spiders']
 NEWSPIDER_MODULE = 'torrent_survival.spiders'
 
 ITEM_PIPELINES = {
-    # 'torrent_survival.pipelines.AnimeStorePipeline': 150,
+    'torrent_survival.pipelines.AnimeStorePipeline': 150,
     # 'torrent_survival.pipelines.ReleaserInitPipeline':200,
-    'torrent_survival.pipelines.CleasingPipeline': 300,
-    'torrent_survival.pipelines.RecordTorrentPipeline': 350,
-    'torrent_survival.pipelines.NewRecordPipeline': 400,
-    # 'torrent_survival.pipelines.StorePipeline': 800,
+    # 'torrent_survival.pipelines.CleasingPipeline': 300,
+    # 'torrent_survival.pipelines.RecordTorrentPipeline': 350,
+    # 'torrent_survival.pipelines.NewRecordPipeline': 400,
 }
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent

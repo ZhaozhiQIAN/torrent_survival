@@ -41,7 +41,7 @@ class CleasingPipeline(object):
 
 class RecordTorrentPipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf")
+        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf", charset='utf8')
         self.cursor = self.conn.cursor()
     def process_item(self, item, spider):
         # query the existence of torrent
@@ -72,7 +72,7 @@ class RecordTorrentPipeline(object):
 
 class NewRecordPipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf")
+        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf", charset='utf8')
         self.cursor = self.conn.cursor()
     def process_item(self, item, spider):
         # query the existence of Anime
@@ -162,7 +162,7 @@ class NewRecordPipeline(object):
 
 class ReleaserInitPipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf")
+        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf", charset='utf8')
         self.cursor = self.conn.cursor()
     def process_item(self, item, spider):
         try:
@@ -176,7 +176,7 @@ class ReleaserInitPipeline(object):
 
 class AnimeStorePipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf")
+        self.conn = MySQLdb.connect(db='ani_torr' ,read_default_file="~/.my.cnf", charset='utf8')
         self.cursor = self.conn.cursor()
         now = datetime.now()
         self.now = datetime.strftime(now,'%Y-%m-%d')
